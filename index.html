@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thrive — Unified App Preview</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#F4F3FF;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1rem;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.page-label{font-size:13px;color:#6B7280;margin-bottom:6px;text-align:center}
+.page-title{font-size:22px;font-weight:600;color:#1C1B2E;text-align:center;margin-bottom:4px}
+.page-sub{font-size:13px;color:#9CA3AF;text-align:center;margin-bottom:24px;max-width:360px}
+.phone{width:360px;background:#18172A;border-radius:52px;padding:10px;box-shadow:0 40px 100px rgba(24,23,42,0.5),0 8px 24px rgba(24,23,42,0.3),inset 0 1px 0 rgba(255,255,255,0.1)}
+.sw{background:#EDEAFF;border-radius:44px;height:720px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.aob{display:flex;align-items:center;padding:14px 18px 4px;flex-shrink:0;gap:8px}
+.aob-btn{border:none;border-radius:100px;padding:5px 11px;cursor:pointer;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px;font-family:inherit;transition:opacity .12s}
+.aob-btn:hover{opacity:.85}
+.sb{display:flex;justify-content:space-between;align-items:center;padding:2px 20px 8px;flex-shrink:0}
+.screens{position:relative;flex:1;overflow:hidden}
+.scr{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:8px 15px 16px;background:#EDEAFF;scrollbar-width:none}
+.scr::-webkit-scrollbar{display:none}
+.ov{position:absolute;inset:0;background:rgba(18,17,35,0.85);z-index:200;display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;pointer-events:none;transition:opacity .2s}
+.ov.visible{opacity:1;pointer-events:all}
+.ov.bottom{align-items:flex-end;padding:8px}
+.ovc{background:white;border-radius:26px;padding:20px 18px;width:100%;max-height:92%;overflow-y:auto}
+.tabs{display:flex;background:white;border-top:1px solid #E8E3FF;padding:9px 0 16px;flex-shrink:0}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;background:none;color:#C0BCDF;font-family:inherit;transition:color .12s}
+.tab i{font-size:21px}
+.tab span{font-size:11px;font-weight:600}
+.tab.on{color:#6B5FF7}
+.card{background:white;border-radius:16px;padding:13px 14px;margin-bottom:9px}
+.chip{display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:700}
+.new-c{background:#DCFCE7;color:#15803D}
+.sl{font-size:11px;font-weight:700;color:#A8A4C8;margin:12px 0 7px;letter-spacing:.03em}
+.btn-p{background:#6B5FF7;color:white;border:none;border-radius:12px;padding:10px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .12s;width:100%}
+.btn-p:hover{opacity:.88}
+.btn-s{background:#EDE9FF;color:#6B5FF7;border:none;border-radius:12px;padding:10px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.ctx{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:700}
+.ed{width:30px;height:30px;border-radius:50%;border:2.5px solid #D4CFFF;background:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.ed.on{background:#6B5FF7;border-color:#6B5FF7}
+.ed.on::after{content:'';width:9px;height:9px;border-radius:50%;background:white}
+.step{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid #F0ECFF}
+.step:last-child{border:none}
+.sn{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.cattag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700;margin-left:6px}
+.qg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.qi{background:white;border-radius:13px;padding:11px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:background .12s}
+.qi:hover{background:#F5F2FF}
+.qi-i{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.tmpl{background:#F7F5FF;border:1.5px solid #E4DFFF;border-radius:13px;padding:12px 13px;margin-bottom:8px;cursor:pointer;transition:border-color .12s}
+.tmpl:hover,.tmpl.open{border-color:#6B5FF7}
+.tmpl.open{background:white}
+.wg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.wt{background:white;border-radius:14px;padding:12px 10px;text-align:center;cursor:pointer}
+.alert{border-radius:13px;padding:12px 13px;margin-bottom:9px;display:flex;align-items:flex-start;gap:10px}
+.pi{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #F0ECFF}
+.pi:last-child{border:none}
+.pt{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.so{display:flex;align-items:center;gap:10px;padding:12px 13px;border-radius:13px;background:#F5F3FF;border:1.5px solid #EDE9FF;cursor:pointer;width:100%;margin-bottom:7px;font-family:inherit;text-align:left}
+.so-i{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tgl{display:flex;background:#EDE9FF;border-radius:10px;padding:3px;margin-bottom:14px}
+.tgl-opt{flex:1;text-align:center;padding:7px 4px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;color:#6B5FF7;transition:all .15s}
+.tgl-opt.on{background:white;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.ob-opt{display:flex;align-items:center;gap:12px;padding:14px;border-radius:14px;border:1.5px solid #E4E0FF;cursor:pointer;margin-bottom:10px;transition:border-color .12s}
+.ob-opt:hover{border-color:#6B5FF7}
+.ob-i{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cbtn{padding:7px 13px;border-radius:9px;border:1.5px solid #E4E0FF;background:white;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;color:#9CA3AF;transition:all .12s}
+.cbtn.sel{border-color:#6B5FF7;background:#EDE9FF;color:#6B5FF7}
+.act-btn{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:12px;background:white;border:1.5px solid #E4E0FF;cursor:pointer;font-family:inherit;text-align:left;width:100%;margin-bottom:7px}
+.act-btn:last-child{margin-bottom:0}
+.act-i{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ext-nav{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+.ext-nav button{font-size:12px;padding:7px 14px;border:1px solid #D1D5DB;background:white;border-radius:8px;cursor:pointer;color:#374151;font-family:inherit;transition:background .12s}
+.ext-nav button:hover{background:#F9FAFB}
+.ext-nav .danger{background:#FEE2E2;border-color:#FECACA;color:#991B1B}
+.ext-nav .warn{background:#FEF3C7;border-color:#FDE68A;color:#92400E}
+.ext-nav .path{background:#EDE9FF;border-color:#C4BEFF;color:#4B3FBF}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+ 
+<p class="page-label">App preview · unified · interactive prototype</p>
+<h1 class="page-title">Thrive</h1>
+<p class="page-sub">One app, one data model — your accommodations and history carry forward from study into work and life</p>
+ 
+<div class="phone">
+ <div class="sw">
+ 
+  <!-- App Header Bar -->
+  <div class="aob">
+   <span style="font-size:14px;font-weight:800;color:#6B5FF7;letter-spacing:-.3px">thrive</span>
+   <span style="font-size:11px;font-weight:700;background:#EDE9FF;color:#6B5FF7;padding:2px 8px;border-radius:5px;cursor:pointer" id="ctx-indicator" onclick="toggleContext()" role="button">Student Mode</span>
+   <div style="display:flex;gap:7px;margin-left:auto">
+    <button class="aob-btn" style="background:#FEF3C7;color:#92400E" onclick="showOv('ov-decoder')" aria-label="Open decoder"><i class="fas fa-language" style="font-size:12px" aria-hidden="true"></i> Decode</button>
+    <button class="aob-btn" style="background:#FEE2E2;color:#991B1B" onclick="showOv('ov-crisis')" aria-label="Open emergency helper"><i class="fas fa-exclamation-circle" style="font-size:12px" aria-hidden="true"></i> Overwhelm</button>
+   </div>
+  </div>
+
+  <!-- Screen Content Manager -->
+  <div class="screens">
+    
+    <!-- Home Dashboard Screen -->
+    <div id="scr-home" class="scr">
+      <div class="card">
+        <h3 style="font-size:16px;margin-bottom:4px;color:#1C1B2E">Welcome Back</h3>
+        <p style="font-size:13px;color:#6B7280" id="home-subtext">Here are your active academic tasks and accommodations.</p>
+      </div>
+
+      <p class="sl">TODAY'S SCHEDULE</p>
+      <div class="card">
+        <div class="step">
+          <div class="sn" style="background:#E8E5FF;color:#6B5FF7">1</div>
+          <div>
+            <h4 style="font-size:13px;color:#1C1B2E" id="task-title-1">Review Lecture Notes</h4>
+            <p style="font-size:11px;color:#9CA3AF">Focus block: 25 mins</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sn" style="background:#E8E5FF;color:#6B5FF7">2</div>
+          <div>
+            <h4 style="font-size:13px;color:#1C1B2E" id="task-title-2">Submit Draft Research Proposal</h4>
+            <p style="font-size:11px;color:#9CA3AF">Deadline: 5:00 PM</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="sl">ACTIVE ACCOMMODATIONS</p>
+      <div class="card">
+        <div class="step">
+          <div class="pt" style="background:#E0F2FE;color:#0369A1"><i class="fas fa-clock"></i></div>
+          <div>
+            <h4 style="font-size:13px;color:#1C1B2E">Extended Time</h4>
+            <p style="font-size:11px;color:#9CA3AF">+25% on timed assessments</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="pt" style="background:#FEF3C7;color:#92400E"><i class="fas fa-glasses"></i></div>
+          <div>
+            <h4 style="font-size:13px;color:#1C1B2E">Dyslexia Support</h4>
+            <p style="font-size:11px;color:#9CA3AF">Font: Dyslexie, dark mode enabled</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accommodations / Settings Screen -->
+    <div id="scr-settings" class="scr hidden">
+      <div class="card">
+        <h3 style="font-size:16px;margin-bottom:8px;color:#1C1B2E">Your Cognitive Profile</h3>
+        <p style="font-size:13px;color:#6B7280">These settings adjust the UI/UX framework dynamically.</p>
+      </div>
+
+      <p class="sl">ACTIVE ACCOMMODATIONS</p>
+      <div class="card">
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:12px;font-weight:600;color:#1C1B2E">Extended Test Time</span>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <p style="font-size:11px;color:#9CA3AF">+25% additional time on assessments</p>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:12px;font-weight:600;color:#1C1B2E">Dyslexia-Friendly Font</span>
+          <label class="toggle-switch">
+            <input type="checkbox" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <p class="sl">APPEARANCE</p>
+      <div class="card">
+        <div class="tgl">
+          <button class="tgl-opt on" onclick="setTheme('light')">Light</button>
+          <button class="tgl-opt" onclick="setTheme('dark')">Dark</button>
+          <button class="tgl-opt" onclick="setTheme('auto')">Auto</button>
+        </div>
+      </div>
+
+      <button class="btn-p" style="margin-top:12px" onclick="saveSettings()">Save Settings</button>
+    </div>
+
+    <!-- Resources Screen -->
+    <div id="scr-resources" class="scr hidden">
+      <div class="card">
+        <h3 style="font-size:16px;margin-bottom:8px;color:#1C1B2E">Resources & Support</h3>
+        <p style="font-size:13px;color:#6B7280">Quick access to helpful tools and documentation.</p>
+      </div>
+
+      <p class="sl">QUICK TOOLS</p>
+      <div class="qg">
+        <div class="qi" onclick="alert('Focus Timer launched')">
+          <div class="qi-i" style="background:#E8E5FF;color:#6B5FF7"><i class="fas fa-hourglass-start"></i></div>
+          <span style="font-size:11px;font-weight:600">Focus Timer</span>
+        </div>
+        <div class="qi" onclick="alert('Stress Tracker opened')">
+          <div class="qi-i" style="background:#FEE2E2;color:#991B1B"><i class="fas fa-heart"></i></div>
+          <span style="font-size:11px;font-weight:600">Wellness</span>
+        </div>
+        <div class="qi" onclick="alert('Study Guide accessed')">
+          <div class="qi-i" style="background:#DCFCE7;color:#15803D"><i class="fas fa-book"></i></div>
+          <span style="font-size:11px;font-weight:600">Study Guides</span>
+        </div>
+      </div>
+
+      <p class="sl">SUPPORT CONTACTS</p>
+      <div class="card">
+        <div class="so" onclick="alert('Contacting Disability Services...')">
+          <div class="so-i" style="background:#E0F2FE;color:#0369A1"><i class="fas fa-headset"></i></div>
+          <div>
+            <h4 style="font-size:12px;color:#1C1B2E;font-weight:600">Disability Services</h4>
+            <p style="font-size:11px;color:#9CA3AF">Monday-Friday, 9 AM - 5 PM</p>
+          </div>
+        </div>
+        <div class="so" onclick="alert('Launching emergency protocol...')">
+          <div class="so-i" style="background:#FEE2E2;color:#991B1B"><i class="fas fa-life-ring"></i></div>
+          <div>
+            <h4 style="font-size:12px;color:#1C1B2E;font-weight:600">Crisis Support</h4>
+            <p style="font-size:11px;color:#9CA3AF">24/7 availability</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation Tabs -->
+  <div class="tabs">
+    <button class="tab on" onclick="switchScreen('scr-home')">
+      <i class="fas fa-home"></i>
+      <span>Home</span>
+    </button>
+    <button class="tab" onclick="switchScreen('scr-settings')">
+      <i class="fas fa-sliders-h"></i>
+      <span>Settings</span>
+    </button>
+    <button class="tab" onclick="switchScreen('scr-resources')">
+      <i class="fas fa-book"></i>
+      <span>Resources</span>
+    </button>
+  </div>
+
+  <!-- Overlay: Decoder -->
+  <div id="ov-decoder" class="ov">
+    <div class="ovc">
+      <h2 style="font-size:16px;margin-bottom:12px;color:#1C1B2E">Language Decoder</h2>
+      <p style="font-size:13px;color:#6B7280;margin-bottom:16px">Need help understanding academic or technical jargon? Enter any term below.</p>
+      <input type="text" placeholder="Enter a term to decode..." style="width:100%;padding:10px 12px;border:1.5px solid #E4E0FF;border-radius:8px;font-family:inherit;margin-bottom:12px">
+      <button class="btn-p" onclick="decodeTerms()">Decode</button>
+      <button class="btn-s" onclick="closeOv()" style="margin-top:8px;width:100%">Close</button>
+    </div>
+  </div>
+
+  <!-- Overlay: Crisis Support -->
+  <div id="ov-crisis" class="ov bottom">
+    <div class="ovc" style="max-height:60%">
+      <h2 style="font-size:16px;margin-bottom:12px;color:#1C1B2E">Overwhelm Support</h2>
+      <div style="background:#FEF3C7;border-left:4px solid #92400E;padding:12px;border-radius:6px;margin-bottom:12px">
+        <p style="font-size:12px;color:#92400E;font-weight:600">You've activated support mode</p>
+      </div>
+      <div class="step">
+        <div class="sn" style="background:#E8E5FF;color:#6B5FF7;font-weight:700">1</div>
+        <div>
+          <h4 style="font-size:12px;color:#1C1B2E;font-weight:600">Take a moment</h4>
+          <p style="font-size:11px;color:#9CA3AF">Try a 2-minute breathing exercise</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn" style="background:#E8E5FF;color:#6B5FF7;font-weight:700">2</div>
+        <div>
+          <h4 style="font-size:12px;color:#1C1B2E;font-weight:600">Get support</h4>
+          <p style="font-size:11px;color:#9CA3AF">Contact disability services or a counselor</p>
+        </div>
+      </div>
+      <button class="btn-p" onclick="alert('Connecting to support...'); closeOv()">Get Help Now</button>
+      <button class="btn-s" onclick="closeOv()" style="margin-top:8px;width:100%">Close</button>
+    </div>
+  </div>
+
+ </div>
+</div>
+
+<style>
+/* Toggle Switch Styling */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #CBD5E1;
+  transition: 0.3s;
+  border-radius: 24px;
+}
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+input:checked + .toggle-slider {
+  background-color: #6B5FF7;
+}
+input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
+</style>
+
+<script>
+// Screen Navigation
+function switchScreen(screenId) {
+  // Hide all screens
+  const screens = document.querySelectorAll('.scr');
+  screens.forEach(screen => screen.classList.add('hidden'));
+  
+  // Show selected screen
+  document.getElementById(screenId).classList.remove('hidden');
+  
+  // Update active tab
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(tab => tab.classList.remove('on'));
+  event.target.closest('.tab')?.classList.add('on');
+}
+
+// Overlay Management
+function showOv(overlayId) {
+  const overlay = document.getElementById(overlayId);
+  if (overlay) {
+    overlay.classList.add('visible');
+  }
+}
+
+function closeOv() {
+  const overlays = document.querySelectorAll('.ov');
+  overlays.forEach(ov => ov.classList.remove('visible'));
+}
+
+// Close overlay on background click
+document.addEventListener('click', function(event) {
+  if (event.target.classList.contains('ov')) {
+    closeOv();
+  }
+});
+
+// Context Toggle (Student/Professional Mode)
+let isStudentMode = true;
+function toggleContext() {
+  isStudentMode = !isStudentMode;
+  const indicator = document.getElementById('ctx-indicator');
+  const homeSubtext = document.getElementById('home-subtext');
+  
+  if (isStudentMode) {
+    indicator.textContent = 'Student Mode';
+    indicator.style.background = '#EDE9FF';
+    homeSubtext.textContent = 'Here are your active academic tasks and accommodations.';
+  } else {
+    indicator.textContent = 'Work Mode';
+    indicator.style.background = '#E0F2FE';
+    homeSubtext.textContent = 'Here are your active projects and workplace accommodations.';
+  }
+}
+
+// Theme Management
+function setTheme(theme) {
+  const buttons = document.querySelectorAll('.tgl-opt');
+  buttons.forEach(btn => btn.classList.remove('on'));
+  event.target.classList.add('on');
+  console.log('Theme set to:', theme);
+}
+
+// Settings Save
+function saveSettings() {
+  alert('✓ Settings saved successfully!');
+}
+
+// Decoder Function
+function decodeTerms() {
+  const input = document.querySelector('#ov-decoder input');
+  const term = input.value || 'term';
+  alert(`Definition: ${term} - a complex academic concept explained in simple terms.`);
+}
+
+// Dynamic task updates
+function updateTasks(tasks) {
+  tasks.forEach((task, index) => {
+    const element = document.getElementById(`task-title-${index + 1}`);
+    if (element) element.textContent = task;
+  });
+}
+</script>
+
+</body>
+</html>
